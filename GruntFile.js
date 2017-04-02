@@ -11,8 +11,14 @@ module.exports = function(grunt){
             }
         },
         watch: {
-            files: 'src/**',
-            tasks: ['default']
+            default: {
+                files: 'src/**',
+                tasks: ['default']
+            },
+            debug: { 
+                files: 'src/**',
+                tasks: ['debug']
+            }, 
         },
         uglify: {
             background: {
@@ -25,6 +31,6 @@ module.exports = function(grunt){
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-browserify');
-    grunt.registerTask('default', ['browserify', 'uglify', 'watch']);
-    grunt.registerTask('debug', ['browserify', 'watch']);
+    grunt.registerTask('default', ['browserify', 'uglify', 'watch:default']);
+    grunt.registerTask('debug', ['browserify', 'watch:debug']);
 };
