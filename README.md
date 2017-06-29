@@ -1,4 +1,4 @@
-Base Chrome Extension with Webpack, Babel, Browserify, Yarn, and Node configurations.
+Base Chrome Extension with Webpack, Babel, Yarn, and Node configurations.
 
 The extension source lives in the "src" folder. Grunt is set up to build "src/app/Background.js" into a bundle in the "dist/js" folder.
 
