@@ -6,5 +6,5 @@ const main = document.createElement( 'script' );
 main.src = main_script_url;
 document.addEventListener( 'DOMContentLoaded', ( e ) => {
 	// In correctly constructed pages the <head> element will always be at index 1
-    e.target.all[1].append( main );
+	e.target.all[1].append( main );
 });

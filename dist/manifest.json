@@ -1,21 +1,21 @@
 {
-    "manifest_version": 2,
-    "name": "Vrchat Chrome Extension",
-    "description": "Vrchat Chrome Extension",
-    "version": "1.0",
-    "permissions": [
-        "https://www.vrchat.net/*",
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "https://www.vrchat.net/*"
-            ],
-            "js": [ "js/app.js" ],
-            "run_at": "document_start"
-        }
-    ],
-    "web_accessible_resources": [
-        "js/main.js"
-    ]
+	"manifest_version": 2,
+	"name": "Vrchat Chrome Extension",
+	"description": "Vrchat Chrome Extension",
+	"version": "1.0",
+	"permissions": [
+		"https://www.vrchat.net/*"
+	],
+	"content_scripts": [
+		{
+			"matches": [
+				"https://www.vrchat.net/*"
+			],
+			"js": [ "js/app.js" ],
+			"run_at": "document_start"
+		}
+	],
+	"web_accessible_resources": [
+		"js/main.js"
+	]
 }
