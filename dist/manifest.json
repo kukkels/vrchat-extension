@@ -11,11 +11,16 @@
 			"matches": [
 				"https://www.vrchat.net/*"
 			],
-			"js": [ "js/app.js" ],
+			"js": [
+				"build/app.js"
+			],
+			"css": [
+				"build/main.css"
+			],
 			"run_at": "document_start"
 		}
 	],
 	"web_accessible_resources": [
-		"js/main.js"
+		"build/main.js"
 	]
 }

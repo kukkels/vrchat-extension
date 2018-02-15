@@ -1,5 +1,7 @@
 import BabiliPlugin from 'babili-webpack-plugin'
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import webpack from 'webpack'
+
 const PROD = process.env.NODE_ENV === 'production';
 
 const config = {
@@ -8,16 +10,29 @@ const config = {
 		main: './src/app/main.js',
 	},
 	output: {
-		path: __dirname + '/dist/js',
+		path: __dirname + '/dist/build',
 		filename: '[name].js'
 	},
-	plugins: [],
+	plugins: [
+		new ExtractTextPlugin( '[name].css' )
+	],
 	watchOptions: {
 		aggregateTimeout: 300,
 		poll: 1000,
 	},
-	externals: {
-		'./main.js': './main.js',
+	module: {
+		rules: [
+			{
+				test: /\.scss$/,
+				use: ExtractTextPlugin.extract({
+					fallback: 'style-loader',
+					use: [
+						'css-loader',
+						'sass-loader'
+					]
+				})
+			}
+		]
 	}
 };
 
