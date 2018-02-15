@@ -6,8 +6,8 @@ const PROD = process.env.NODE_ENV === 'production';
 
 const config = {
 	entry: {
-		app: './src/app/app.js',
-		main: './src/app/main.js',
+		app: './src/app.js',
+		main: './src/main.js',
 	},
 	output: {
 		path: __dirname + '/dist/build',
