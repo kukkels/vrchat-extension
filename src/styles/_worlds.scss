@@ -1,0 +1,21 @@
+.user,
+.world {
+	width: auto !important;
+	height: auto !important;
+	background: $secondary !important; // wtf is wrong with the web devs at vrchat?
+	flex: 1;
+
+	h3 {
+		word-break: break-word;
+	}
+
+	p {
+		margin-bottom: 0;
+	}
+}
+
+.bg-primary .row .col-lg-8>div {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+}
