@@ -1,17 +1,21 @@
 {
     "manifest_version": 2,
-    "name": "Base Chrome Extension",
-    "description": "Base Chrome Extension with Grunt, Babel, Browserify, Yarn, and Node configurations.",
+    "name": "Vrchat Chrome Extension",
+    "description": "Vrchat Chrome Extension",
     "version": "1.0",
     "permissions": [
-        "declarativeContent",
-        "tabs"
+        "https://www.vrchat.net/*",
     ],
-    "browser_action": {},
-    "incognito": "split",
-    "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
-    "background": {
-        "scripts": ["js/background-bundle.js"],
-        "persistent": true
-    }
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.vrchat.net/*"
+            ],
+            "js": [ "js/app.js" ],
+            "run_at": "document_start"
+        }
+    ],
+    "web_accessible_resources": [
+        "js/main.js"
+    ]
 }
