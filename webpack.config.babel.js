@@ -18,7 +18,8 @@ const config = {
 	],
 	watchOptions: {
 		aggregateTimeout: 300,
-		poll: 1000,
+		poll: 100,
+		ignored: 'node_modules',
 	},
 	module: {
 		rules: [
@@ -31,16 +32,28 @@ const config = {
 						'sass-loader'
 					]
 				})
+			},
+			{
+				test: /\.js$/,
+				exclude: /(node_modules)/,
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: [ 'env' ]
+					}
+				}
 			}
 		]
 	}
 };
 
 if ( PROD ) {
+	/*
 	config.plugins.push( new BabiliPlugin() );
 	config.plugins.push( new webpack.DefinePlugin({
 		'process.env.NODE_ENV': JSON.stringify( 'production' )
 	}));
+	*/
 }
 
 module.exports = config;

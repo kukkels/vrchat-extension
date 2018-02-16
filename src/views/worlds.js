@@ -1,9 +1,10 @@
 import interceptor from '../libs/interceptor';
-const $ = jQuery;
+import $ from 'jquery';
 
 export default class Worlds {
 	constructor() {
 		this.cachedWorlds = {};
+
 		// When a friends api call is detected display stuff
 		interceptor( '/auth/user/friends', ( ret, xhr ) => {
 			let data = JSON.parse( ret );
