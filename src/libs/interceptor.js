@@ -1,4 +1,8 @@
+const interceptors = [];
+
 export default function interceptor( request, cb ) {
+	interceptors.push( { request, cb } );
+
 	const origOpen = XMLHttpRequest.prototype.open;
 	XMLHttpRequest.prototype.open = function() {
 		if ( ! this._hooked ) {
@@ -12,12 +16,18 @@ export default function interceptor( request, cb ) {
 		function getter() {
 			delete xhr.responseText;
 			let ret = xhr.responseText;
-			if ( xhr.responseURL.includes( request ) ) {
-				if ( ! ( 'ret' in xhr ) ) {
-					xhr.ret = cb( ret, xhr );
+
+			if ( ! ( 'done' in xhr ) ) {
+				for( const inst of interceptors ) {
+					if ( xhr.responseURL.includes( inst.request ) ) {
+						ret = inst.cb( ret, xhr );
+					}
 				}
-				ret = xhr.ret;
+				xhr.done = ret;
+			} else {
+				ret = xhr.done;
 			}
+
 			setup();
 			return ret;
 		}
@@ -30,4 +40,6 @@ export default function interceptor( request, cb ) {
 		}
 		setup();
 	}
+
+	return interceptors;
 }
