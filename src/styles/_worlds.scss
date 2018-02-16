@@ -14,6 +14,15 @@
 	}
 }
 
+.users,
+.worlds {
+	.row {
+		// Fixes horizontal scrollbar on worlds page
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+	}
+}
+
 .bg-primary .row .col-lg-8>div {
 	display: flex;
 	flex-wrap: wrap;

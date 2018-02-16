@@ -1,38 +1,72 @@
 import interceptor from '../libs/interceptor';
+import docReady from '../libs/docready';
 import $ from 'jquery';
+import Url from 'domurl';
 
 export default class Worlds {
-	constructor() {
-		this.cachedWorlds = {};
+	/**
+	 * Cached world data
+	 *
+	 * @type {Object}
+	 */
+	cachedWorlds = {};
 
-		// When a friends api call is detected display stuff
+	constructor() {
+		// When a friends api call is detected display worlds and also fix possible errors in it
 		interceptor( '/auth/user/friends', ( ret, xhr ) => {
-			let data = JSON.parse( ret );
-			for( const user of data ) {
-				if ( user.location === 'private' ) {
-					user.location += ':0';
-				}
-			}
-			data = JSON.stringify( data );
-			this.docReady();
+			let data = JSON.stringify( this.fixUserData( JSON.parse( ret ) ) );
+			docReady.then( () => this.displayWorlds() );
 			return data;
 		});
-		$( () => this.docReady() );
+
+		docReady.then( () => this.docReady() );
 	}
 
+	/**
+	 * Fix friends api call private location as the vrchat website cant handle it
+	 *
+	 * @param  {Array} data User friends as an array.
+	 * @return {Array}      Possibly modified user friends as an array.
+	 */
+	fixUserData( data ) {
+		for( const user of data ) {
+			if ( user.location === 'private' ) {
+				user.location += ':0';
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * Ran on document ready
+	 */
 	docReady() {
-		$( '.user a' ).each( ( i, el ) => {
-			// Get world id from link
-			const href = el.href.match( /(wrld.+?)\&/ );
-			if ( href ) {
-				const world = href[1];
-				// Generate a unique color from the link
-				const color = this.stringToColor( el.href );
+		this.displayWorlds();
+	}
 
+	/**
+	 * Function to run on first load or when refreshing friends
+	 */
+	displayWorlds() {
+		const $links = $( '.user a' );
+		this.showWorlds( $links );
+		this.showColors( $links );
+	}
+
+	/**
+	 * Show worlds for all friends that are not in private worlds
+	 *
+	 * @param  {jQuery} $links A jquery object of links
+	 */
+	showWorlds( $links ) {
+		$links.each( ( i, el ) => {
+			const $user = $( el ).parent();
+			// Get data from link
+			const url = new Url( el.href );
+			if ( url.query.worldId !== 'private' ) {
 				// Get world data with world id
-				this.getWorld( world ).then( ( resp ) => {
-					const $user = $( el ).parent();
-
+				this.getWorld( url.query.worldId ).then( ( resp ) => {
 					// Construct container like this so we don't generate more if one already exists
 					let $cont = $user.children( '.user_world' ).empty();
 					if ( ! $cont.length ) {
@@ -44,12 +78,52 @@ export default class Worlds {
 					const $img = $( '<img>' ).prop( 'src', resp.thumbnailImageUrl );
 					$cont.append( $title, $img );
 					$user.append( $cont );
-
-					// This is just so you can easily see who is in the same location as someone else
-					$user.css({
-						boxShadow: '0 0 1.5rem .5rem ' + color,
-					});
 				});
+			} else {
+				// Remove the world div if user is in a private world
+				$user.children( '.user_world' ).remove();
+			}
+		});
+	}
+
+	/**
+	 * Show a color on each player that is in the same world
+	 *
+	 * @param  {jQuery} $links A jquery object of links
+	 */
+	showColors( $links ) {
+		const locations = [];
+		// First pass that collects all instanceId's so we can check if more than one user is in a particular instance
+		$links.each( ( i, el ) => {
+			const url = new Url( el.href );
+			const { worldId, instanceId } = url.query;
+
+			if ( worldId !== 'private' ) {
+				if ( ! locations[ instanceId ] ) {
+					locations[ instanceId ] = [];
+				}
+
+				locations[ instanceId ].push( $( el ).parent() );
+			}
+		});
+
+		// Second pass to apply box shadow to those that are in the same world and remove box shadow from all others
+		$links.each( ( i, el ) => {
+			const $user = $( el ).parent();
+			const url = new Url( el.href );
+			const { worldId, instanceId } = url.query;
+
+			// If user is in a private world or the location has only this user then remove box shadow
+			if ( worldId !== 'private' && locations[ instanceId ].length > 1 ) {
+				// Generate a semi random color from the instanceId
+				const color = this.stringToColor( instanceId );
+				for( const $user of locations[ instanceId ] ) {
+					$user.css({
+						'box-shadow': '0 0 1.5rem .5rem ' + color,
+					});
+				}
+			} else {
+				$user.css( { 'box-shadow': '' } );
 			}
 		});
 	}
