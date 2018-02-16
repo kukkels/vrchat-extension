@@ -1,8 +1,6 @@
-import BabiliPlugin from 'babili-webpack-plugin'
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import webpack from 'webpack'
-
-const PROD = process.env.NODE_ENV === 'production';
+const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+const UglifyJsPlugin = require( 'uglifyjs-webpack-plugin' );
+const PROD = process.argv.indexOf( '-p' ) !== -1;
 
 const config = {
 	entry: {
@@ -48,12 +46,25 @@ const config = {
 };
 
 if ( PROD ) {
-	/*
-	config.plugins.push( new BabiliPlugin() );
-	config.plugins.push( new webpack.DefinePlugin({
-		'process.env.NODE_ENV': JSON.stringify( 'production' )
+	config.plugins.push( new UglifyJsPlugin({
+		uglifyOptions: {
+			output: {
+				comments: false,
+				beautify: false,
+			},
+			mangle: true,
+			compress: {
+				sequences: true,
+				dead_code: true,
+				conditionals: true,
+				booleans: true,
+				unused: true,
+				if_return: true,
+				join_vars: true,
+				drop_console: true
+			}
+		}
 	}));
-	*/
 }
 
 module.exports = config;
