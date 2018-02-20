@@ -11,6 +11,9 @@ export default class Worlds {
 	 */
 	cachedWorlds = {};
 
+	/**
+	 * Initializes class and adds friends api call and docready listeners
+	 */
 	constructor() {
 		// When a friends api call is detected display worlds and also fix possible errors in it
 		interceptor( '/auth/user/friends', ( ret, xhr ) => {

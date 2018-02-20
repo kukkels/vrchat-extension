@@ -19,8 +19,5 @@
 			],
 			"run_at": "document_start"
 		}
-	],
-	"web_accessible_resources": [
-		"build/main.js"
 	]
 }
