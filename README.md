@@ -6,9 +6,6 @@
 - Autofocus on inputs
 - Autologin if last session has not expired
 
-### User home page
-- Logout button
-
 ### Worlds page
 - Fix bug that causes friends not to show if one of them is in a private world
 - See what worlds your friends are in and how many people are in that instance
