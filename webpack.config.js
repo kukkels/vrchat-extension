@@ -37,6 +37,7 @@ const config = {
 				use: {
 					loader: 'babel-loader',
 					options: {
+						compact: true,
 						presets: [
 							'env'
 						],

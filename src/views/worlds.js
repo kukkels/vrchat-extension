@@ -2,6 +2,7 @@ import interceptor from '../libs/interceptor';
 import docReady from '../libs/docready';
 import $ from 'jquery';
 import Url from 'domurl';
+import _ from 'lodash';
 
 export default class Worlds {
 	/**
@@ -67,19 +68,34 @@ export default class Worlds {
 			const $user = $( el ).parent();
 			// Get data from link
 			const url = new Url( el.href );
-			if ( url.query.worldId !== 'private' ) {
+			const { worldId, instanceId } = url.query;
+			if ( worldId !== 'private' ) {
 				// Get world data with world id
-				this.getWorld( url.query.worldId ).then( ( resp ) => {
+				this.getWorld( worldId ).then( ( resp ) => {
 					// Construct container like this so we don't generate more if one already exists
 					let $cont = $user.children( '.user_world' ).empty();
 					if ( ! $cont.length ) {
 						$cont = $( '<div>' ).addClass( 'user_world' );
 					}
 
+					// Get instance user count
+					const user_count = _.get( _.find( resp.instances, ( inst ) => {
+						return inst[0] === instanceId;
+					}), '1', 0 );
+
 					// Finally display world data below user
-					const $title = $( '<h4>' ).text( resp.name );
-					const $img = $( '<img>' ).prop( 'src', resp.thumbnailImageUrl );
-					$cont.append( $title, $img );
+					const $title      = $( '<h4>' ).text( resp.name );
+					const $img_cont   = $( '<div>' ).addClass( 'world_image_container' );
+					const $img        = $( '<img>' ).prop( 'src', resp.thumbnailImageUrl );
+					$img_cont.append( $img );
+
+					// Add instance user count if it was found
+					if ( user_count ) {
+						const $user_count = $( '<span>' ).addClass( 'world_user_count' ).text( user_count );
+						$img_cont.append( $user_count );
+					}
+
+					$cont.append( $title, $img_cont );
 					$user.append( $cont );
 				});
 			} else {

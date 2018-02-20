@@ -11,7 +11,7 @@
 
 ### Worlds page
 - Fix bug that causes friends not to show if one of them is in a private world
-- See what worlds your friends are in
+- See what worlds your friends are in and how many people are in that instance
 - See who of them are in the same instance
 
 ## Using/Developing
@@ -21,6 +21,12 @@ Run the following inside the project folder
 ```
 # Install required packages
 npm install
+
+# Install webpack globally
+npm install -g webpack
+
+# If the above doesn't work try adding sudo like so:
+sudo npm install -g webpack
 
 # Compile javascript
 webpack -p && webpack -p

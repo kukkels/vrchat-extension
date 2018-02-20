@@ -4,6 +4,13 @@
 	height: auto !important;
 	background: $secondary !important; // wtf is wrong with the web devs at vrchat?
 	flex: 1;
+	display: flex;
+	flex-direction: column;
+
+	// Use the link to push all other elements down
+	a {
+		flex: 1;
+	}
 
 	h3 {
 		word-break: break-word;
@@ -11,6 +18,11 @@
 
 	p {
 		margin-bottom: 0;
+	}
+
+	// Auto set image height so they look better while loading
+	img {
+		height: 150px;
 	}
 }
 
@@ -27,4 +39,19 @@
 	display: flex;
 	flex-wrap: wrap;
 	flex-direction: row;
+}
+
+.world_image_container {
+	position: relative;
+	display: table;
+	margin: 0 auto;
+
+	.world_user_count {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		padding: .5rem;
+		font-family: Arial;
+		background-color: $secondary;
+	}
 }
