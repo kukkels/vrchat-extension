@@ -6,11 +6,11 @@ import _ from 'lodash';
 
 export default class Worlds {
 	/**
-	 * Cached world data
+	 * Current promise queue
 	 *
 	 * @type {Object}
 	 */
-	cachedWorlds = {};
+	queue = {};
 
 	/**
 	 * Initializes class and adds friends api call and docready listeners
@@ -19,11 +19,9 @@ export default class Worlds {
 		// When a friends api call is detected display worlds and also fix possible errors in it
 		interceptor( '/auth/user/friends', ( ret, xhr ) => {
 			let data = JSON.stringify( this.fixUserData( JSON.parse( ret ) ) );
-			docReady.then( () => this.displayWorlds() );
+			docReady.then( () => this.showWorlds( JSON.parse( data ) ) );
 			return data;
 		});
-
-		docReady.then( () => this.docReady() );
 	}
 
 	/**
@@ -43,125 +41,181 @@ export default class Worlds {
 	}
 
 	/**
-	 * Ran on document ready
-	 */
-	docReady() {
-		this.displayWorlds();
-	}
-
-	/**
-	 * Function to run on first load or when refreshing friends
-	 */
-	displayWorlds() {
-		const $links = $( '.user a' );
-		this.showWorlds( $links );
-		this.showColors( $links );
-	}
-
-	/**
 	 * Show worlds for all friends that are not in private worlds
 	 *
-	 * @param  {jQuery} $links A jquery object of links
+	 * @param {object} friends Friend list.
 	 */
-	showWorlds( $links ) {
-		$links.each( ( i, el ) => {
-			const $user = $( el ).parent();
-			// Get data from link
-			const url = new Url( el.href );
-			const { worldId, instanceId } = url.query;
-			if ( worldId !== 'private' ) {
-				// Get world data with world id
-				this.getWorld( worldId ).then( ( resp ) => {
-					// Construct container like this so we don't generate more if one already exists
-					let $cont = $user.children( '.user_world' ).empty();
-					if ( ! $cont.length ) {
-						$cont = $( '<div>' ).addClass( 'user_world' );
-					}
+	showWorlds( friends ) {
+		// Group friends by world and sortby friend amount
+		const groups = _.sortBy( this.parseFriends( friends ), 'friends.length' );
 
-					// Get instance user count
-					const user_count = _.get( _.find( resp.instances, ( inst ) => {
-						return inst[0] === instanceId;
-					}), '1', 0 );
+		// When all data retrieval is done start the render
+		Promise.all([
+			...( _.map( groups, 'world' ) ),
+			...( _.map( groups, 'instance' ) ),
+		]).then( ( data ) => {
+			// Collapse the promises into their values
+			groups.forEach( ( group, i ) => {
+				group.world    = data[ i ]; // Everything before half of the data array is world data
+				group.instance = data[ data.length / 2 + i ]; // Everything after half of the data array is instance data
+			});
 
-					// Finally display world data below user
-					const $title      = $( '<h4>' ).text( resp.name );
-					const $img_cont   = $( '<div>' ).addClass( 'world_image_container' );
-					const $img        = $( '<img>' ).prop( 'src', resp.thumbnailImageUrl );
-					$img_cont.append( $img );
-
-					// Add instance user count if it was found
-					if ( user_count ) {
-						const $user_count = $( '<span>' ).addClass( 'world_user_count' ).text( user_count );
-						$img_cont.append( $user_count );
-					}
-
-					$cont.append( $title, $img_cont );
-					$user.append( $cont );
-				});
-			} else {
-				// Remove the world div if user is in a private world
-				$user.children( '.user_world' ).remove();
-			}
+			// Render the groups
+			this.renderGroups( groups );
 		});
 	}
 
 	/**
-	 * Show a color on each player that is in the same world
+	 * Render the friend groups
 	 *
-	 * @param  {jQuery} $links A jquery object of links
+	 * @param {array} groups An array of friend groups.
 	 */
-	showColors( $links ) {
-		const locations = [];
-		// First pass that collects all instanceId's so we can check if more than one user is in a particular instance
-		$links.each( ( i, el ) => {
-			const url = new Url( el.href );
-			const { worldId, instanceId } = url.query;
+	renderGroups( groups ) {
+		// Store the friends element container
+		const $cont = $( '.user, .group' ).parent().empty().addClass( 'groups' );
 
-			if ( worldId !== 'private' ) {
-				if ( ! locations[ instanceId ] ) {
-					locations[ instanceId ] = [];
+		for( const group of groups ) {
+			const $group      = $( '<div>' ).addClass( 'group' );
+			const $users      = $( '<div>' ).addClass( 'users' );
+			const $friends    = $( '<div>' ).addClass( 'friends' );
+
+			// Render friends
+			for( const friend of group.friends ) {
+				$friends.append( this.renderUser( friend ) );
+			}
+
+			if ( group.world && group.instance ) {
+				const $world_data = $( '<div>' ).addClass( 'world_data' );
+
+				// Filter friends from others
+				group.instance.users = _.differenceWith( group.instance.users, group.friends, ( a, b ) => {
+					return a.id === b.id;
+				});
+				// Render non friends
+				if ( group.instance.users.length ) {
+					const $other = $( '<div>' ).addClass( 'other' );
+
+					for( const user of group.instance.users ) {
+						$other.append( this.renderUser( user ) );
+					}
+
+					$users.append( $other );
 				}
 
-				locations[ instanceId ].push( $( el ).parent() );
+				// Render world info
+				const $name          = $( '<p>' ).text( group.world.name );
+				const $img           = $( '<img>' ).addClass( 'world_img' ).prop( 'src', group.world.thumbnailImageUrl );
+				const $instance_type = $( '<p>' ).addClass( 'instance_type' ).text();
+
+				$world_data.append( $name, $img, $instance_type );
+				$group.append( $world_data );
+
+				const table_data = [
+					[
+						'players',
+						( group.friends.length + group.instance.users.length ) + '/' + group.world.capacity,
+					],
+					/*
+					[
+						'type',
+						'asd', // Most likely get from location
+					],
+					[
+						'owner',
+						'asd', // Get from instance data (store every retrieved user data first)
+					]
+					*/
+				];
+
+				const $table = $( '<table>' );
+				for( const data of table_data ) {
+					const $row = $( '<tr>' );
+					for( const item of data ) {
+						$row.append( $( '<td>' ).html( item ) );
+					}
+					$table.append( $row );
+				}
+				$world_data.append( $table );
 			}
-		});
 
-		// Second pass to apply box shadow to those that are in the same world and remove box shadow from all others
-		$links.each( ( i, el ) => {
-			const $user = $( el ).parent();
-			const url = new Url( el.href );
-			const { worldId, instanceId } = url.query;
+			// Finally construct whole group and add it
+			$group.append( $users );
+			$users.prepend( $friends );
+			$cont.append( $group );
+		}
+	}
 
-			// If user is in a private world or the location has only this user then remove box shadow
-			if ( worldId !== 'private' && locations[ instanceId ].length > 1 ) {
-				// Generate a semi random color from the instanceId
-				const color = this.stringToColor( instanceId );
-				for( const $user of locations[ instanceId ] ) {
-					$user.css({
-						'box-shadow': '0 0 1.5rem .5rem ' + color,
+	/**
+	 * Render a single user
+	 *
+	 * @param  {object} user User object.
+	 * @return {jQuery}      A jquery element.
+	 */
+	renderUser( user ) {
+		const $user_cont = $( '<div>' ).addClass( 'user_cont' );
+		const $name      = $( '<p>' ).text( user.displayName );
+		const $img       = $( '<img>' ).addClass( 'user_img' ).prop( 'src', user.currentAvatarThumbnailImageUrl );
+
+		$user_cont.append( $name, $img );
+		return $user_cont;
+	}
+
+	/**
+	 * Parse friends into groups by instance
+	 *
+	 * @param  {array} friends An array of friends.
+	 * @return {array}         An array of instance, world & friend data.
+	 */
+	parseFriends( friends ) {
+		const groups = [];
+
+		for( const friend of friends ) {
+			const { location } = friend;
+
+			// If a group already exists for this location then add user to it
+			let found = false;
+			for( const group of groups ) {
+				if ( group.location === location ) {
+					group.friends.push( friend );
+					found = true;
+					break;
+				}
+			}
+
+			// Only create a new group if user wasnt added to one
+			if ( ! found ) {
+				const worldId = location.split( ':' )[0] || null;
+				// Check for worldId validity
+				if ( worldId !== 'offline' ) {
+					const instanceId = location.split( ':' )[1] || null;
+					const world      = worldId !== 'private' ? this.apiGet( '/api/1/worlds/' + worldId ) : null;
+					const instance   = worldId !== 'private' ? this.apiGet( '/api/1/worlds/' + worldId + '/' + instanceId ) : null;
+					const friends    = [
+						friend,
+					];
+
+					groups.push({
+						friends,
+						location,
+						instance,
+						world,
 					});
 				}
-			} else {
-				$user.css( { 'box-shadow': '' } );
 			}
-		});
+		}
+
+		return groups;
 	}
 
 	/**
-	 * Get world data with world id
+	 * Send a get request to api url
 	 *
-	 * @param  {String} world World id.
-	 * @return {Promise}      Promise with world data as an object.
+	 * @param  {String} url Api url.
+	 * @return {Promise}    Promise with result.
 	 */
-	getWorld( world ) {
-		// Don't retrieve a world that is already being retrieved
-		if ( world in this.cachedWorlds ) {
-			return this.cachedWorlds[ world ];
-		}
-
-		// Store the retrieval request
-		this.cachedWorlds[ world ] = new Promise( ( resolve, reject ) => {
-			fetch( '/api/1/worlds/' + world, {
+	apiGet( url ) {
+		return new Promise( ( resolve, reject ) => {
+			fetch( url, {
 				credentials: 'same-origin',
 			}).then( ( resp ) => {
 				return resp.json();
@@ -169,28 +223,5 @@ export default class Worlds {
 				resolve( resp );
 			});
 		});
-
-		// Return the promise
-		return this.cachedWorlds[world];
-	}
-
-	/**
-	 * Turn arbitary string into a hex color
-	 * https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript#answer-16348977
-	 *
-	 * @param  {String} str String to calculate color from.
-	 * @return {String}     Hex color.
-	 */
-	stringToColor( str ) {
-		let hash = 0;
-		for ( const chr of str ) {
-			hash = chr.charCodeAt() + ( ( hash << 5 ) - hash );
-		}
-		let color = '#';
-		for ( let i = 0; i < 3; i++ ) {
-			const val = ( hash >> ( i * 8 ) ) & 0xFF;
-			color += ( '00' + val.toString( 16 ) ).substr( -2 );
-		}
-		return color;
 	}
 }
