@@ -60,9 +60,28 @@ export default class Worlds {
 				group.instance = data[ data.length / 2 + i ]; // Everything after half of the data array is instance data
 			});
 
-			// Render the groups
-			this.renderGroups( groups );
+			// Sort and render the groups
+			this.renderGroups( this.sortGroups( groups ) );
 		});
+	}
+
+	/**
+	 * Sort groups by friend count and private worlds always at the bottom
+	 *
+	 * @param  {array} groups An array of groups
+	 * @return {array}        Sorted groups
+	 */
+	sortGroups( groups ) {
+		// Sort by friend count
+		groups = groups.sort( ( a, b ) => {
+			return a.friends.length < b.friends.length;
+		});
+		// Move private worlds to the bottom
+		groups = groups.sort( ( a, b ) => {
+			return ! a.world;
+		});
+
+		return groups;
 	}
 
 	/**
