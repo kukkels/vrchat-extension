@@ -98,7 +98,9 @@ export default class Worlds {
 	sortGroupUsers( group ) {
 		// Sort friends & instance users by name
 		group.friends = _.sortBy( group.friends, 'displayName' );
-		group.instance.users = _.sortBy( group.instance.users, 'displayName' );
+		if ( group.instance ) {
+			group.instance.users = _.sortBy( group.instance.users, 'displayName' );
+		}
 
 		return group;
 	}
@@ -153,11 +155,11 @@ export default class Worlds {
 						'players',
 						( group.friends.length + group.instance.users.length ) + '/' + group.world.capacity,
 					],
-					/*
 					[
 						'type',
-						'asd', // Most likely get from location
+						this.getInstanceType( group.location ),
 					],
+					/*
 					[
 						'owner',
 						'asd', // Get from instance data (store every retrieved user data first)
@@ -180,6 +182,24 @@ export default class Worlds {
 			$group.append( $users );
 			$users.prepend( $friends );
 			$cont.append( $group );
+		}
+	}
+
+	/**
+	 * Get instance type from location
+	 *
+	 * @param  {string} location Location to parse.
+	 * @return {string}          Instance type.
+	 */
+	getInstanceType( location ) {
+		if ( location.includes( 'hidden' ) ) {
+			return 'friends+';
+		}
+		else if ( location.includes( 'wrld' ) ) {
+			return 'public';
+		}
+		else {
+			return 'private';
 		}
 	}
 
