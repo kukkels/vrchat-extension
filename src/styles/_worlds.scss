@@ -68,6 +68,35 @@
 				}
 			}
 		}
+
+		.user_cont {
+			position: relative;
+
+			p {
+				display: inline;
+				margin: 0;
+				border-bottom: .1rem dotted white;
+				cursor: pointer;
+				text-transform: none;
+			}
+
+			.user_img {
+				display: none;
+				position: absolute;
+				top: 100%;
+				right: 0;
+				width: 20rem;
+				padding-top: $spacing / 2;
+				height: auto;
+				z-index: 10;
+			}
+
+			&:hover {
+				.user_img {
+					display: block;
+				}
+			}
+		}
 	}
 
 	.users {

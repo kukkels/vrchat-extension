@@ -5,12 +5,13 @@ import Url from 'domurl';
 import _ from 'lodash';
 
 export default class Worlds {
+
 	/**
-	 * Current promise queue
+	 * An object of retrieved user data
 	 *
 	 * @type {Object}
 	 */
-	queue = {};
+	users = {};
 
 	/**
 	 * Initializes class and adds friends api call and docready listeners
@@ -53,12 +54,26 @@ export default class Worlds {
 		Promise.all([
 			...( _.map( groups, 'world' ) ),
 			...( _.map( groups, 'instance' ) ),
+			...( _.map( groups, 'owner' ) ),
 		]).then( ( data ) => {
 			// Collapse the promises into their values
 			groups.forEach( ( group, i ) => {
-				group.world    = data[ i ]; // Everything before half of the data array is world data
-				group.instance = data[ data.length / 2 + i ]; // Everything after half of the data array is instance data
+				group.world    = data[ data.length / 3 * 0 + i ];
+				group.instance = data[ data.length / 3 * 1 + i ];
+				group.owner    = data[ data.length / 3 * 2 + i ];
+
+				if ( group.instance ) {
+					// Store all users that are retrieved
+					this.users = _.assign( this.users, _.zipObject( _.map( group.instance.users, 'id' ), group.instance.users ) );
+
+					// Filter friends from others
+					group.instance.users = _.differenceWith( group.instance.users, group.friends, ( a, b ) => {
+						return a.id === b.id;
+					});
+				}
 			});
+
+			// this.users = Object.assign( this.users, _.zipObject( group.friends, group.friends.map( ( user ) => user.id; ) ) );
 
 			// Sort and render the groups
 			this.renderGroups( this.sortGroups( groups ) );
@@ -127,10 +142,6 @@ export default class Worlds {
 			if ( group.world && group.instance ) {
 				const $world_data = $( '<div>' ).addClass( 'world_data' );
 
-				// Filter friends from others
-				group.instance.users = _.differenceWith( group.instance.users, group.friends, ( a, b ) => {
-					return a.id === b.id;
-				});
 				// Render non friends
 				if ( group.instance.users.length ) {
 					const $other = $( '<div>' ).addClass( 'other' );
@@ -150,23 +161,25 @@ export default class Worlds {
 				$world_data.append( $name, $img, $instance_type );
 				$group.append( $world_data );
 
+				// Collect instance metadata
 				const table_data = [
 					[
 						'players',
-						( group.friends.length + group.instance.users.length ) + '/' + group.world.capacity,
+						$( '<span>' ).text( ( group.friends.length + group.instance.users.length ) + '/' + group.world.capacity ).prop( 'title', 'Actual max: (' + group.world.capacity * 2 + ')' ),
 					],
 					[
 						'type',
 						this.getInstanceType( group.location ),
 					],
-					/*
-					[
-						'owner',
-						'asd', // Get from instance data (store every retrieved user data first)
-					]
-					*/
 				];
+				if ( group.owner ) {
+					table_data.push([
+						'owner',
+						this.renderUser( group.owner ),
+					]);
+				}
 
+				// Show instance metadata
 				const $table = $( '<table>' );
 				for( const data of table_data ) {
 					const $row = $( '<tr>' );
@@ -195,12 +208,40 @@ export default class Worlds {
 		if ( location.includes( 'hidden' ) ) {
 			return 'friends+';
 		}
+		else if ( location.includes( 'friends' ) ) {
+			return 'friends';
+		}
 		else if ( location.includes( 'wrld' ) ) {
 			return 'public';
 		}
 		else {
 			return 'private';
 		}
+	}
+
+	/**
+	 * Get instance owner from location data
+	 *
+	 * @param  {string} location      Instance location.
+	 * @return {object|Promise|false} User data.
+	 */
+	getInstanceOwner( location ) {
+		// This only works for friends+ & friends instances
+		if ( [ 'friends+', 'friends' ].includes( this.getInstanceType( location ) ) ) {
+			const userId = _.get( /\((.+)\)~nonce/.exec( location ), '[1]', null );
+
+			if ( userId ) {
+				if ( userId in this.users ) {
+					return this.users[ userId ];
+				}
+				else {
+					return this.apiGet( '/api/1/users/' + userId );
+				}
+
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -248,6 +289,7 @@ export default class Worlds {
 					const instanceId = location.split( ':' )[1] || null;
 					const world      = worldId !== 'private' ? this.apiGet( '/api/1/worlds/' + worldId ) : null;
 					const instance   = worldId !== 'private' ? this.apiGet( '/api/1/worlds/' + worldId + '/' + instanceId ) : null;
+					const owner      = this.getInstanceOwner( location );
 					const friends    = [
 						friend,
 					];
@@ -257,6 +299,7 @@ export default class Worlds {
 						location,
 						instance,
 						world,
+						owner,
 					});
 				}
 			}
