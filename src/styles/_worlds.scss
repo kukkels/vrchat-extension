@@ -12,7 +12,7 @@
 	}
 
 	h3 {
-		word-break: break-word;
+		@include word-break;
 	}
 
 	p {
@@ -40,12 +40,19 @@
 	margin-bottom: $spacing * 2;
 	justify-content: center;
 
+	@media only screen and ( max-width: $size-md ) {
+		flex-direction: column;
+	}
+
 	.world_data {
 		display: flex;
 		flex-basis: 20%;
 		flex-direction: column;
 		padding-top: $spacing;
 		align-items: center;
+		@media only screen and ( max-width: $size-md ) {
+			flex-basis: auto;
+		}
 
 		.world_img {
 			width: 20rem;
@@ -57,14 +64,26 @@
 			width: 100%;
 			max-width: 20rem;
 			border-collapse: collapse;
+			margin-top: $spacing / 2;
 
 			td {
-				padding: 1rem 0;
+				padding: ( $spacing / 4 ) 0;
 				text-align: left;
 				text-transform: capitalize;
 
 				&:last-child {
 					text-align: right;
+				}
+			}
+
+			@media only screen and ( max-width: $size-sm ) {
+				td {
+					display: block;
+
+					&:last-child {
+						text-align: left;
+						padding-bottom: $spacing;
+					}
 				}
 			}
 		}
@@ -78,6 +97,8 @@
 				border-bottom: .1rem dotted white;
 				cursor: pointer;
 				text-transform: none;
+
+				@include word-break;
 			}
 
 			.user_img {
@@ -111,6 +132,10 @@
 
 			.user_cont {
 				padding: $spacing;
+
+				p {
+					@include word-break;
+				}
 
 				.user_img {
 					width: 20rem;
