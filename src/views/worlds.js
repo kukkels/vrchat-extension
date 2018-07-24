@@ -81,7 +81,26 @@ export default class Worlds {
 			return ! a.world;
 		});
 
+		// Sort users in groups
+		groups.map( ( group ) => {
+			return this.sortGroupUsers( group );
+		});
+
 		return groups;
+	}
+
+	/**
+	 * Sort users in group by name
+	 *
+	 * @param  {object} group Group data.
+	 * @return {object}       Sorted group data.
+	 */
+	sortGroupUsers( group ) {
+		// Sort friends & instance users by name
+		group.friends = _.sortBy( group.friends, 'displayName' );
+		group.instance.users = _.sortBy( group.instance.users, 'displayName' );
+
+		return group;
 	}
 
 	/**

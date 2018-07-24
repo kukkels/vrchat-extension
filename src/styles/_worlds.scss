@@ -25,24 +25,31 @@
 	}
 }
 
+.groups {
+	margin: 0 $spacing;
+	font-family: Arial;
+}
+
 .group {
 	display: flex;
 	flex: 1;
 	flex-basis: 100%;
 	flex-wrap: wrap;
 	background-color: $dark-bg;
-	padding: 2rem;
-	margin-bottom: 2rem;
+	padding: $spacing;
+	margin-bottom: $spacing * 2;
+	justify-content: center;
 
 	.world_data {
 		display: flex;
 		flex-basis: 20%;
 		flex-direction: column;
-		padding-top: 2rem;
+		padding-top: $spacing;
 		align-items: center;
 
 		.world_img {
-			max-width: 20rem;
+			width: 20rem;
+			max-width: 100%;
 			height: auto !important;
 		}
 
@@ -74,10 +81,11 @@
 			flex-wrap: wrap;
 
 			.user_cont {
-				padding: 2rem;
+				padding: $spacing;
 
 				.user_img {
-					max-width: 20rem;
+					width: 20rem;
+					max-width: 100%;
 					height: auto !important;
 				}
 			}
