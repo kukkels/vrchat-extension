@@ -31,7 +31,13 @@ export default class Login {
 	 */
 	checkLogin() {
 		if ( Cookie.get( 'auth' ) ) {
-			window.location.href = '/home';
+			// If we were referred here then the auth cookie has expired
+			if ( document.referrer ) {
+				Cookie.remove( 'auth' );
+			}
+			else {
+				window.location.href = '/home';
+			}
 		}
 	}
 
