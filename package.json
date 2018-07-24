@@ -4,7 +4,9 @@
   "description": "Vrchat Chrome Extension",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run pre && webpack -p",
+    "watch": "npm run pre && webpack --watch",
+    "pre": "webpack"
   },
   "author": "kukkels",
   "license": "ISC",
@@ -21,6 +23,7 @@
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.5",
     "node-sass": "^4.7.2",
+    "post-compile-webpack-plugin": "^0.1.2",
     "raw-loader": "^0.5.1",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.20.2",

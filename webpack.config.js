@@ -1,10 +1,14 @@
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const UglifyJsPlugin = require( 'uglifyjs-webpack-plugin' );
+const PostCompile = require( 'post-compile-webpack-plugin' )
+const fs = require( 'fs' );
+const webpack = require( 'webpack' );
+
 const PROD = process.argv.indexOf( '-p' ) !== -1;
+const WATCH = process.argv.indexOf( '--watch' ) !== -1;
 
 const config = {
 	entry: {
-		app: './src/app.js',
 		main: './src/main.js',
 	},
 	output: {
@@ -71,6 +75,20 @@ if ( PROD ) {
 			}
 		}
 	}));
+}
+
+// Only compile the complete app if the first compile is done
+if ( PROD || WATCH ) {
+
+	// Dont remove the mid step files on watch mode
+	if ( PROD ) {
+		config.plugins.push( new PostCompile(() => {
+			fs.unlinkSync( './dist/build/main.js' );
+		}));
+		delete config.entry.main;
+	}
+
+	config.entry.app = './src/app.js';
 }
 
 module.exports = config;
