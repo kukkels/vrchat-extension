@@ -1,4 +1,5 @@
 import './styles/main.scss';
+import 'dustjs-helpers';
 import Worlds from './views/worlds';
 import Login from './views/login';
 import Home from './views/home';

@@ -7,6 +7,18 @@ import _ from 'lodash';
 export default class Worlds {
 
 	/**
+	 * Contains dust partials that are used on this page
+	 *
+	 * @type {Object}
+	 */
+	partials = {
+		worlds: dust.loadSource( require( '../partials/worlds.dust' ) ),
+		shared: {
+			user: dust.loadSource( require( '../partials/shared/user.dust' ) ),
+		},
+	}
+
+	/**
 	 * An object of retrieved user data
 	 *
 	 * @type {Object}
@@ -66,10 +78,19 @@ export default class Worlds {
 					// Store all users that are retrieved
 					this.users = _.assign( this.users, _.zipObject( _.map( group.instance.users, 'id' ), group.instance.users ) );
 
+					// Collect player count data
+					group.instance.playercount = {
+						total:   group.instance.users.length,
+						max:     group.world.capacity * 2,
+					};
+
 					// Filter friends from others
 					group.instance.users = _.differenceWith( group.instance.users, group.friends, ( a, b ) => {
 						return a.id === b.id;
 					});
+
+					// Store instance type
+					group.instance.type = this.getInstanceType( group.location );
 				}
 			});
 
@@ -127,75 +148,19 @@ export default class Worlds {
 	 */
 	renderGroups( groups ) {
 		// Store the friends element container
-		const $cont = $( '.user, .group' ).parent().empty().addClass( 'groups' );
+		const $cont = $( '.user, .group' ).parent().addClass( 'groups' );
 
-		for( const group of groups ) {
-			const $group      = $( '<div>' ).addClass( 'group' );
-			const $users      = $( '<div>' ).addClass( 'users' );
-			const $friends    = $( '<div>' ).addClass( 'friends' );
-
-			// Render friends
-			for( const friend of group.friends ) {
-				$friends.append( this.renderUser( friend ) );
+		dust.render( this.partials.worlds, { groups }, ( err, out ) => {
+			if ( ! err ) {
+				// No need to render if the output is exactly the same
+				if ( $cont.html() !== out ) {
+					$cont.html( out );
+				}
 			}
-
-			if ( group.world && group.instance ) {
-				const $world_data = $( '<div>' ).addClass( 'world_data' );
-
-				// Render non friends
-				if ( group.instance.users.length ) {
-					const $other = $( '<div>' ).addClass( 'other' );
-
-					for( const user of group.instance.users ) {
-						$other.append( this.renderUser( user ) );
-					}
-
-					$users.append( $other );
-				}
-
-				// Render world info
-				const $name          = $( '<p>' ).text( group.world.name );
-				const $img           = $( '<img>' ).addClass( 'world_img' ).prop( 'src', group.world.thumbnailImageUrl );
-				const $instance_type = $( '<p>' ).addClass( 'instance_type' ).text();
-
-				$world_data.append( $name, $img, $instance_type );
-				$group.append( $world_data );
-
-				// Collect instance metadata
-				const table_data = [
-					[
-						'players',
-						$( '<span>' ).text( ( group.friends.length + group.instance.users.length ) + '/' + group.world.capacity ).prop( 'title', 'Actual max: (' + group.world.capacity * 2 + ')' ),
-					],
-					[
-						'type',
-						this.getInstanceType( group.location ),
-					],
-				];
-				if ( group.owner ) {
-					table_data.push([
-						'owner',
-						this.renderUser( group.owner ),
-					]);
-				}
-
-				// Show instance metadata
-				const $table = $( '<table>' );
-				for( const data of table_data ) {
-					const $row = $( '<tr>' );
-					for( const item of data ) {
-						$row.append( $( '<td>' ).html( item ) );
-					}
-					$table.append( $row );
-				}
-				$world_data.append( $table );
+			else {
+				console.error( err );
 			}
-
-			// Finally construct whole group and add it
-			$group.append( $users );
-			$users.prepend( $friends );
-			$cont.append( $group );
-		}
+		});
 	}
 
 	/**
@@ -242,21 +207,6 @@ export default class Worlds {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Render a single user
-	 *
-	 * @param  {object} user User object.
-	 * @return {jQuery}      A jquery element.
-	 */
-	renderUser( user ) {
-		const $user_cont = $( '<div>' ).addClass( 'user_cont' );
-		const $name      = $( '<p>' ).text( user.displayName );
-		const $img       = $( '<img>' ).addClass( 'user_img' ).prop( 'src', user.currentAvatarThumbnailImageUrl );
-
-		$user_cont.append( $name, $img );
-		return $user_cont;
 	}
 
 	/**

@@ -1,0 +1,55 @@
+{#groups}
+	<div class="group">
+		{#instance}
+			<div class="world_data">
+				{#world}
+					<p>{name}</p>
+					<img class="world_img" src="{thumbnailImageUrl}" alt="">
+				{/world}
+
+				<table>
+					<tbody>
+						{#playercount}
+							<tr>
+								<td>players</td>
+								<td>
+									<span title="Actual max: ({max})">
+										{total}/{world.capacity}
+									</span>
+								</td>
+							</tr>
+						{/playercount}
+						<tr>
+							<td>type</td>
+							<td>{type}</td>
+						</tr>
+						{?owner}
+							<tr>
+								<td>owner</td>
+								<td>
+									{>"src/partials/shared/user" user=owner /}
+								</td>
+							</tr>
+						{/owner}
+					</tbody>
+				</table>
+			</div>
+		{/instance}
+
+		<div class="users">
+			<div class="friends">
+				{#friends}
+					{>"src/partials/shared/user" user=. /}
+				{/friends}
+			</div>
+
+			{?instance.users}
+				<div class="other">
+					{#instance.users}
+						{>"src/partials/shared/user" user=. /}
+					{/instance.users}
+				</div>
+			{/instance.users}
+		</div>
+	</div>
+{/groups}

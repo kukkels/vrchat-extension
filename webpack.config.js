@@ -16,12 +16,20 @@ const config = {
 		filename: '[name].js'
 	},
 	plugins: [
-		new ExtractTextPlugin( '[name].css' )
+		new ExtractTextPlugin( '[name].css' ),
+		new webpack.ProvidePlugin({
+			dust: 'dustjs-linkedin',
+		}),
 	],
 	watchOptions: {
 		aggregateTimeout: 300,
 		poll: 100,
 		ignored: 'node_modules',
+	},
+	resolve: {
+		alias: {
+			'dust.core': 'dustjs-linkedin',
+		},
 	},
 	module: {
 		rules: [
@@ -49,6 +57,12 @@ const config = {
 							'transform-class-properties'
 						]
 					}
+				}
+			},
+			{
+				test: /\.dust$/,
+				use: {
+					loader: 'dust-loader',
 				}
 			}
 		]
