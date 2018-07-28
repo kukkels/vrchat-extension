@@ -2,7 +2,7 @@
 
 ## Installation
 
-1. Go to https://github.com/kukkels/vrchat-extension/releases/latest and download build.zip
+1. Go to the [latest release](../../releases/latest) and download build.zip
 2. Extract the build.zip into a directory
 3. Open chrome extension page chrome://extensions/
 4. Enable developer mode at the top right corner
