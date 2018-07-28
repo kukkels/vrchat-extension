@@ -1,12 +1,17 @@
 {#groups}
 	<div class="group">
-		{#instance}
-			<div class="world_data">
+		<div class="world_data">
+			{?world}
 				{#world}
 					<p>{name}</p>
-					<img class="world_img" src="{thumbnailImageUrl}" alt="">
+					<img class="world_img" src="{thumbnailImageUrl}" alt="World image: {name}">
 				{/world}
+			{:else}
+				<p>Private</p>
+				<img class="world_img private" src="https://assets.vrchat.com/www/images/default_private_image.png" alt="Private world image">
+			{/world}
 
+			{#instance}
 				<table>
 					<tbody>
 						{#playercount}
@@ -33,8 +38,8 @@
 						{/owner}
 					</tbody>
 				</table>
-			</div>
-		{/instance}
+			{/instance}
+		</div>
 
 		<div class="users">
 			<div class="friends">

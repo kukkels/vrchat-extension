@@ -1,6 +1,6 @@
 {#user}
 	<div class="user_cont">
 		<p>{displayName}</p>
-		<img class="user_img" src="{currentAvatarThumbnailImageUrl}" alt="">
+		<img class="user_img" src="{currentAvatarThumbnailImageUrl}" alt="User image: {displayName}">
 	</div>
 {/user}

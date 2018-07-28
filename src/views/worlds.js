@@ -88,9 +88,6 @@ export default class Worlds {
 					group.instance.users = _.differenceWith( group.instance.users, group.friends, ( a, b ) => {
 						return a.id === b.id;
 					});
-
-					// Store instance type
-					group.instance.type = this.getInstanceType( group.location );
 				}
 			});
 
@@ -170,18 +167,45 @@ export default class Worlds {
 	 * @return {string}          Instance type.
 	 */
 	getInstanceType( location ) {
-		if ( location.includes( 'hidden' ) ) {
-			return 'friends+';
+		// Use an array of objects instead of an object because order can matter here
+		const matches = [
+			{
+				match: 'hidden',
+				value: 'friends+',
+			},
+			{
+				match: 'friends',
+				value: 'friends',
+			},
+			{
+				match: 'canRequestInvite',
+				value: 'invite+',
+			},
+			{
+				match: 'private',
+				value: 'invite',
+			},
+			{
+				match: 'wrld',
+				value: 'public',
+			},
+			{
+				match: 'local',
+				value: 'local',
+			},
+			{
+				match: 'offline',
+				value: 'offline',
+			},
+		];
+
+		for( const type of matches ) {
+			if ( location.includes( type.match ) ) {
+				return type.value;
+			}
 		}
-		else if ( location.includes( 'friends' ) ) {
-			return 'friends';
-		}
-		else if ( location.includes( 'wrld' ) ) {
-			return 'public';
-		}
-		else {
-			return 'private';
-		}
+
+		return 'private';
 	}
 
 	/**
@@ -233,9 +257,10 @@ export default class Worlds {
 
 			// Only create a new group if user wasnt added to one
 			if ( ! found ) {
-				const worldId = location.split( ':' )[0] || null;
 				// Check for worldId validity
-				if ( worldId !== 'offline' ) {
+				const type = this.getInstanceType( location );
+				if ( ! [ 'offline', 'local' ].includes( type ) ) {
+					const worldId = location.split( ':' )[0] || null;
 					const instanceId = location.split( ':' )[1] || null;
 					const world      = worldId !== 'private' ? this.apiGet( '/api/1/worlds/' + worldId ) : null;
 					const instance   = worldId !== 'private' ? this.apiGet( '/api/1/worlds/' + worldId + '/' + instanceId ) : null;
@@ -250,6 +275,7 @@ export default class Worlds {
 						instance,
 						world,
 						owner,
+						type,
 					});
 				}
 			}
