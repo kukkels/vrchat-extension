@@ -114,23 +114,24 @@
 			position: relative;
 			padding: 0;
 
+			&:hover {
+				.usercont__link {
+					text-decoration: none;
+					border-bottom-style: solid;
+				}
+				.usercont__avatar {
+					display: block;
+				}
+			}
+
 			&__link {
 				color: inherit;
-				display: inline-block;
+				display: inline;
 				margin: 0;
 				border-bottom: .1rem dotted white;
 				cursor: pointer;
 				text-transform: none;
 				@include word-break;
-
-				&:hover {
-					text-decoration: none;
-					border-bottom-style: solid;
-
-					& + .usercont__avatar {
-						display: block;
-					}
-				}
 			}
 
 			&__avatar {
@@ -172,9 +173,10 @@
 		transition: none;
 		margin-bottom: $spacing / 2;
 		display: inline-block;
+		border-bottom: .1rem solid transparent;
 		&:hover {
 			text-decoration: none;
-			border-bottom: .0625rem solid white;
+			border-bottom-color: white;
 			color: white;
 		}
 
