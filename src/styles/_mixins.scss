@@ -5,3 +5,14 @@
 	word-break: break-word;
 	hyphens: auto;
 }
+.word-break {
+	@include word-break;
+}
+
+@mixin no-select {
+	pointer-events: none;
+	user-select: none;
+}
+.no-select {
+	@include no-select;
+}

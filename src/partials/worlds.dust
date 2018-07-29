@@ -1,55 +1,50 @@
 {#groups}
 	<div class="group">
-		<div class="world_data">
-			{?world}
-				{#world}
-					<p>{name}</p>
-					<img class="world_img" src="{thumbnailImageUrl}" alt="World image: {name}">
-				{/world}
-			{:else}
-				<p>Private</p>
-				<img class="world_img private" src="https://assets.vrchat.com/www/images/default_private_image.png" alt="Private world image">
-			{/world}
+		{#world}
+			<div class="group__world">
+				<p>{name}</p>
+				<img class="group__world__img" src="{thumbnailImageUrl}" alt="World image: {name}">
 
-			{#instance}
-				<table>
-					<tbody>
-						{#playercount}
+				{#instance}
+					<table class="group__world__data">
+						<tbody>
+							{#playercount}
+								<tr>
+									<td>players</td>
+									<td>
+										<span title="Actual max: ({max})">
+											{total}/{world.capacity}
+										</span>
+									</td>
+								</tr>
+							{/playercount}
 							<tr>
-								<td>players</td>
-								<td>
-									<span title="Actual max: ({max})">
-										{total}/{world.capacity}
-									</span>
-								</td>
+								<td>type</td>
+								<td>{type}</td>
 							</tr>
-						{/playercount}
-						<tr>
-							<td>type</td>
-							<td>{type}</td>
-						</tr>
-						{?owner}
-							<tr>
-								<td>owner</td>
-								<td>
-									{>"src/partials/shared/user" user=owner /}
-								</td>
-							</tr>
-						{/owner}
-					</tbody>
-				</table>
-			{/instance}
-		</div>
+							{?owner}
+								<tr>
+									<td>owner</td>
+									<td>
+										{>"src/partials/shared/user" user=owner /}
+									</td>
+								</tr>
+							{/owner}
+						</tbody>
+					</table>
+				{/instance}
+			</div>
+		{/world}
 
-		<div class="users">
-			<div class="friends">
+		<div class="group__users">
+			<div class="group__users-friends">
 				{#friends}
 					{>"src/partials/shared/user" user=. /}
 				{/friends}
 			</div>
 
 			{?instance.users}
-				<div class="other">
+				<div class="group__users-other">
 					{#instance.users}
 						{>"src/partials/shared/user" user=. /}
 					{/instance.users}

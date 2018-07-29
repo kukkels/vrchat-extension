@@ -1,6 +1,11 @@
 {#user}
-	<div class="user_cont">
-		<p>{displayName}</p>
-		<img class="user_img" src="{currentAvatarThumbnailImageUrl}" alt="User image: {displayName}">
+	<div class="usercont">
+		<a class="usercont__link" href="/home/user/{id}">{displayName}</a>
+		<div class="usercont__avatar">
+			<img class="usercont__avatar__img" src="{currentAvatarThumbnailImageUrl}" alt="User image: {displayName}">
+			{^world}
+				<img class="usercont__avatar__img__private" src="https://assets.vrchat.com/www/images/default_private_image.png" alt="Private world">
+			{/world}
+		</div>
 	</div>
 {/user}

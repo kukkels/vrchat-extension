@@ -1,3 +1,6 @@
+///////////////////////////////////////
+// Misc fixes to the worlds page css //
+///////////////////////////////////////
 .world {
 	width: auto !important;
 	height: auto !important;
@@ -19,12 +22,31 @@
 		margin-bottom: 0;
 	}
 
-	// Auto set image height so they look better while loading
+	// Auto set image sizes so they look better while loading
 	img {
-		height: 150px;
+		min-height: 150px;
+		object-fit: contain;
 	}
 }
 
+.users,
+.worlds {
+	.row {
+		// Fixes horizontal scrollbar on worlds page
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+	}
+}
+
+.bg-primary .row .col-lg-8>div {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+}
+
+///////////////////////////////
+// Custom content css styles //
+///////////////////////////////
 .groups {
 	margin: 0 $spacing;
 	font-family: Arial;
@@ -44,7 +66,7 @@
 		flex-direction: column;
 	}
 
-	.world_data {
+	&__world {
 		display: flex;
 		flex-basis: 20%;
 		flex-direction: column;
@@ -54,13 +76,13 @@
 			flex-basis: auto;
 		}
 
-		.world_img {
+		&__img {
 			width: 20rem;
 			max-width: 100%;
 			height: auto !important;
 		}
 
-		table {
+		&__data {
 			width: 100%;
 			max-width: 20rem;
 			border-collapse: collapse;
@@ -88,20 +110,30 @@
 			}
 		}
 
-		.user_cont {
+		.usercont {
 			position: relative;
+			padding: 0;
 
-			p {
-				display: inline;
+			&__link {
+				color: inherit;
+				display: inline-block;
 				margin: 0;
 				border-bottom: .1rem dotted white;
 				cursor: pointer;
 				text-transform: none;
-
 				@include word-break;
+
+				&:hover {
+					text-decoration: none;
+					border-bottom-style: solid;
+
+					& + .usercont__avatar {
+						display: block;
+					}
+				}
 			}
 
-			.user_img {
+			&__avatar {
 				display: none;
 				position: absolute;
 				top: 100%;
@@ -111,57 +143,63 @@
 				height: auto;
 				z-index: 10;
 			}
-
-			&:hover {
-				.user_img {
-					display: block;
-				}
-			}
 		}
 	}
 
-	.users {
+	&__users {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
 
-		.friends,
-		.other {
+		&-friends,
+		&-other {
 			display: flex;
 			flex-wrap: wrap;
-
-			.user_cont {
-				padding: $spacing;
-
-				p {
-					@include word-break;
-				}
-
-				.user_img {
-					width: 20rem;
-					max-width: 100%;
-					height: auto !important;
-				}
-			}
 		}
 
-		.other {
+		&-other {
 			opacity: .2;
 		}
 	}
 }
 
-.users,
-.worlds {
-	.row {
-		// Fixes horizontal scrollbar on worlds page
-		margin-left: 0 !important;
-		margin-right: 0 !important;
-	}
-}
+.usercont {
+	padding: $spacing;
 
-.bg-primary .row .col-lg-8>div {
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
+	&__link {
+		// Override default link styles
+		color: white;
+		transition: none;
+		margin-bottom: $spacing / 2;
+		display: inline-block;
+		&:hover {
+			text-decoration: none;
+			border-bottom: .0625rem solid white;
+			color: white;
+		}
+
+		@include word-break;
+	}
+
+	&__avatar {
+		position: relative;
+
+		&__img {
+			width: 20rem;
+			max-width: 100%;
+			height: auto !important;
+
+			&__private {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				opacity: .7;
+
+				// There is no need to be able to select the overlay
+				@include no-select;
+			}
+		}
+	}
 }
