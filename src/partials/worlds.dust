@@ -5,19 +5,19 @@
 				<p>{name}</p>
 				<img class="group__world__img" src="{thumbnailImageUrl}" alt="World image: {name}">
 
-				{#instance}
+				{?instance}
 					<table class="group__world__data">
 						<tbody>
-							{#playercount}
-								<tr>
-									<td>players</td>
-									<td>
-										<span title="Actual max: ({max})">
-											{total}/{world.capacity}
-										</span>
-									</td>
-								</tr>
-							{/playercount}
+							<tr>
+								<td>players</td>
+								<td>
+									<span title="Actual max: ({@math key=world.capacity method="multiply" operand=2 /})">
+										{@math key=friends.length method="add" operand=instance.users.length /}
+										/
+										{world.capacity}
+									</span>
+								</td>
+							</tr>
 							<tr>
 								<td>type</td>
 								<td>{type}</td>

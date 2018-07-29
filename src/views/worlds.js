@@ -78,12 +78,6 @@ export default class Worlds {
 					// Store all users that are retrieved
 					this.users = _.assign( this.users, _.zipObject( _.map( group.instance.users, 'id' ), group.instance.users ) );
 
-					// Collect player count data
-					group.instance.playercount = {
-						total:   group.instance.users.length,
-						max:     group.world.capacity * 2,
-					};
-
 					// Filter friends from others
 					group.instance.users = _.differenceWith( group.instance.users, group.friends, ( a, b ) => {
 						return a.id === b.id;
