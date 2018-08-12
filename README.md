@@ -9,11 +9,8 @@
 4. Enable developer mode at the top right corner
 5. Click "LOAD UNPACKED" and add the extracted directory
 
-### Firefox (Note. Will be removed on restart)
-1. Go to the [latest release](../../releases/latest) and download build.zip
-2. Open debugging page about:debugging
-3. Click "Load Temporary Add-on"
-4. Select the .zip file
+### Firefox
+https://addons.mozilla.org/addon/vrchat-extension/
 
 ## Current features
 
@@ -42,7 +39,16 @@ npm run build
 npm run watch
 ```
 
-After this just follow the instructions either from Chrome step 3. or If you are on Firefox zip the contents of the dist folder and follow from step 2 on firefox.
+### Chrome
+1. Open chrome extension page chrome://extensions/
+2. Enable developer mode at the top right corner
+3. Click "LOAD UNPACKED" and add the dist directory
+
+### Firefox (Note. Will be removed on restart)
+1. Compress the contents of the dist folder into a .zip file
+2. Open the debugging page (about:debugging)
+3. Click "Load Temporary Add-on"
+4. Select the .zip file
 
 ## Notice
 I am not in any way affiliated with vrchat or anything related to them and not responsible if anything breaks because of this extension.
