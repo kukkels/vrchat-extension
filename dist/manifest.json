@@ -4,12 +4,12 @@
 	"description": "An extension to extend/improve the vrchat website functionality",
 	"version": "1.0",
 	"permissions": [
-		"https://www.vrchat.net/*"
+		"https://*.vrchat.net/*"
 	],
 	"content_scripts": [
 		{
 			"matches": [
-				"https://www.vrchat.net/*"
+				"https://*.vrchat.net/*"
 			],
 			"js": [
 				"build/app.js"
